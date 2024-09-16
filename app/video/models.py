@@ -5,7 +5,9 @@ from core.models import AuditModel
 
 
 class Category(AuditModel):
-    name = models.CharField(max_length=255)
+    name = models.CharField(
+        max_length=255,
+        unique=True)
 
     def __str__(self):
         return self.name
@@ -20,7 +22,7 @@ def video_file_path(instance, filename):
 
 
 class Video(AuditModel):
-    video_path = models.FileField(upload_to='videos/')
+    video = models.FileField(upload_to=video_file_path)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     duration = models.DurationField()

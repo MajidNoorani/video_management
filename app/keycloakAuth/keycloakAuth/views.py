@@ -29,7 +29,7 @@ class KeycloakLoginView(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         keycloak_auth_url = \
-            f"{settings.KEYCLOAK_SERVER_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/auth"  # noqa
+            f"{settings.KEYCLOAK_SERVER_URL}realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/auth"  # noqa
         params = {
             'client_id': settings.KEYCLOAK_CLIENT_ID,
             'response_type': 'code',
@@ -152,7 +152,7 @@ class UpdateUserView(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         keycloak_change_password_url = \
-            f"{settings.KEYCLOAK_SERVER_URL}/realms/{settings.KEYCLOAK_REALM}/account"  # noqa
+            f"{settings.KEYCLOAK_SERVER_URL}realms/{settings.KEYCLOAK_REALM}/account"  # noqa
         return redirect(keycloak_change_password_url)
 
 
@@ -164,14 +164,10 @@ class UserInfoView(GenericAPIView):
     # authentication_classes = [authentication.KeycloakAuthentication,]
 
     def get(self, request, *args, **kwargs):
-        print('hi')
         user_info = request.user.userinfo
-        print('hi1')
         print(user_info)
         serializer = self.get_serializer(data=user_info)
-        print('hi2')
         if serializer.is_valid():
-            print('hi3')
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=400)

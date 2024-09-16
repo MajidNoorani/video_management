@@ -27,7 +27,7 @@ load_dotenv(os.path.join(BASE_DIR.parent, '.env'))
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", 'True').lower() in ('false', '0', 'f', 'False')
+DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't', 'True')
 
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS.extend(
@@ -45,6 +45,7 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", 'http://localhost:3000'
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,7 +77,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -167,8 +168,8 @@ AUTHENTICATION_BACKENDS = [
 STATIC_URL = 'static/static/'
 MEDIA_URL = 'static/media/'
 
-MEDIA_ROOT = '/vol/web/media'
-STATIC_ROOT = '/vol/web/static'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'vol/web/media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'vol/web/static')
 
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, STATIC_URL)]
@@ -192,6 +193,17 @@ SPECTACULAR_SETTINGS = {
 }
 
 
+# Add the ASGI application
+ASGI_APPLICATION = "app.asgi.application"
+
+# Configure channel layers
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
+
 # Keycloak env variables
 
 KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL", default='https://keycloak.com')
@@ -206,4 +218,35 @@ BACKEND_URL = os.getenv("BACKEND_URL", default="http://localhost:8000")  # backe
 BASE_FRONTEND_URL = os.getenv("BASE_FRONTEND_URL", default="http://localhost:8000")
 
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1073741824
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1073741824
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1073741824
+
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+]
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'channels': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

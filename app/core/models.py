@@ -3,13 +3,13 @@ from django.db import models
 from django.utils import timezone
 
 
-class Audit(models.Model):
+class AuditModel(models.Model):
     created_by = models.CharField(
         max_length=255,
         verbose_name="Created By"
         )
     created_date = models.DateTimeField(
-        timezone.now,
+        default=timezone.now,
         verbose_name="Created Date"
         )
     updated_by = models.CharField(
@@ -19,7 +19,7 @@ class Audit(models.Model):
         blank=True
         )
     updated_date = models.DateTimeField(
-        timezone.now,
+        default=timezone.now,
         verbose_name="Updated Date"
         )
 
