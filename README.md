@@ -29,8 +29,7 @@ daphne -v 2 app.asgi:application
     * username: user1
     * password: 1111
 
-**The swagger page address:**
-http://127.0.0.1:8000/api/docs/
+
 
 **Upload Video page:**
 To upload video and check video progress check this address:
@@ -42,5 +41,16 @@ username and password is hardcoded in html file because the only purpose of this
 
 
 # The endpoints:
+
+**The swagger page address:**
+http://127.0.0.1:8000/api/docs/
+
 ![alt text](images/swagger.png)
 
+
+## Keycloak
+
+I have created an instance of keycloak on Cloud-IAM and the credentials are in [.env](.env) file.
+
+An app named keycloakAuth is added to the project to handle authentication and authorization.
+You can get accesss token from this endpoint: http://127.0.0.1:8000/api/keycloakAuth/simple-login/ and then add it to the endpoints as Bearer Token.
