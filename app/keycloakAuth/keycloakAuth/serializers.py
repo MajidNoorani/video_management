@@ -73,3 +73,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['uuid', 'profilePicture', 'createdDate', 'updatedDate']
         read_only_fields = ['uuid', 'createdDate', 'updatedDate']
+
+
+class CreateUserSerializer(serializers.Serializer):
+    "Simple login using username and pass"
+    username = serializers.CharField()
+    email = serializers.CharField()
+    password = serializers.CharField()
+    firstName = serializers.CharField()
+    lastName = serializers.CharField()

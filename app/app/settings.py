@@ -11,36 +11,37 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
+from dotenv import dotenv_values
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # load envitornment variables
-load_dotenv(os.path.join(BASE_DIR.parent, '.env'))
-
+# load_dotenv(os.path.join(BASE_DIR.parent, '.env'))
+config = dotenv_values(os.path.join(BASE_DIR.parent, '.env'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+SECRET_KEY = config['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", 'False').lower() in ('true', '1', 't', 'True')
+DEBUG = config["DEBUG"].lower() in ('true', '1', 't', 'True') or False
 
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS.extend(
     filter(
         None,
-        os.getenv('ALLOWED_HOSTS', '').split(','),
+        config['ALLOWED_HOSTS'].split(','),
     )
 )
 
-CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", 'http://localhost:3000').split(',')
+CORS_ALLOWED_ORIGINS = config["CORS_ALLOWED_ORIGINS"].split(',') or 'http://localhost:3000'
 CORS_ALLOW_CREDENTIALS = True
 # CORS_ALLOW_HEADERS = ['*']
-CSRF_TRUSTED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", 'http://localhost:3000').split(',')
+CSRF_TRUSTED_ORIGINS = config["CORS_ALLOWED_ORIGINS"].split(',') or 'http://localhost:3000'
 
 # Application definition
 
@@ -57,8 +58,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_spectacular',
     'app',
+    'video',
     'keycloakAuth.keycloakAuth',
-    'video'
+
 ]
 
 MIDDLEWARE = [
@@ -99,10 +101,10 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-        'NAME': os.getenv('DB_NAME', 'videoManagement'),
-        'USER': os.getenv('DB_USER', 'devuser'),
-        'PASSWORD': os.getenv('DB_PASS', 'changeme')
+        'HOST': config['DB_HOST'] or '127.0.0.1',
+        'NAME': config['DB_NAME'] or 'videoManagement',
+        'USER': config['DB_USER'] or 'devuser',
+        'PASSWORD': config['DB_PASS'] or 'changeme'
     }
 }
 
@@ -206,21 +208,20 @@ CHANNEL_LAYERS = {
 
 # Keycloak env variables
 
-KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL", default='https://keycloak.com')
-KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", default='VideoManagement')
-KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID", default='ClientID')
-KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET", default='changeme')
-KEYCLOAK_REDIRECT_URI = os.getenv("KEYCLOAK_REDIRECT_URI", default='http://localhost:8000/api/keycloakAuth/callback/')
-KEYCLOAK_ADMIN = os.getenv("KEYCLOAK_ADMIN", default='admin')
-KEYCLOAK_ADMIN_PASSWORD = os.getenv("KEYCLOAK_ADMIN_PASSWORD", default='changeme')
-FRONT_URL = os.getenv("FRONT_URL", default="https://example.com")  # front url of the project
-BACKEND_URL = os.getenv("BACKEND_URL", default="http://localhost:8000")  # backend url of the project
-BASE_FRONTEND_URL = os.getenv("BASE_FRONTEND_URL", default="http://localhost:8000")
-
+KEYCLOAK_SERVER_URL = config["KEYCLOAK_SERVER_URL"] or 'https://keycloak.com'
+KEYCLOAK_REALM = config["KEYCLOAK_REALM"] or 'VideoManagement'
+KEYCLOAK_CLIENT_ID = config["KEYCLOAK_CLIENT_ID"] or 'ClientID'
+KEYCLOAK_CLIENT_SECRET = config["KEYCLOAK_CLIENT_SECRET"] or 'changeme'
+KEYCLOAK_REDIRECT_URI = config["KEYCLOAK_REDIRECT_URI"] or 'http://localhost:8000/api/keycloakAuth/callback/'
+KEYCLOAK_ADMIN = config["KEYCLOAK_ADMIN"] or 'admin'
+KEYCLOAK_ADMIN_PASSWORD = config["KEYCLOAK_ADMIN_PASSWORD"] or 'changeme'
+FRONT_URL = config["FRONT_URL"] or "https://example.com"  # front url of the project
+BACKEND_URL = config["BACKEND_URL"] or "http://localhost:8000"  # backend url of the project
+BASE_FRONTEND_URL = config["BASE_FRONTEND_URL"] or "http://localhost:8000"
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1073741824
-FILE_UPLOAD_MAX_MEMORY_SIZE = 1073741824
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1073741824
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1073741824  # 1GB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1073741824  # 1GB
 
 FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',

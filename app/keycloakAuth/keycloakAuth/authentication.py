@@ -13,7 +13,8 @@ class KeycloakAuthentication(BaseAuthentication):
         access_token = auth_header.split()[1]
         try:
             userinfo = KC_openID_services.get_user_info(access_token)
-            user = KeycloakUser(userinfo)
+            decoded_token = KC_openID_services.decode_token(access_token)
+            user = KeycloakUser(userinfo, decoded_token)
             return (user, None)
         except:
             raise AuthenticationFailed(
@@ -51,8 +52,15 @@ class IsKeycloakAuthenticated(BasePermission):
 
 
 class KeycloakUser:
-    def __init__(self, userinfo):
+    def __init__(self, userinfo, decoded_token):
         self.userinfo = userinfo
+        self.realm_roles = decoded_token.get(
+            'resource_access', {}
+            ).get(
+                'realm-management', {}
+            ).get(
+                'roles', {}
+            )
 
     @property
     def is_authenticated(self):
@@ -66,3 +74,11 @@ class KeycloakUser:
 
     def __contains__(self, item):
         return item in self.userinfo
+
+    def has_role(self, role):
+        """Check if user has a specific role."""
+        return role in self.realm_roles
+
+    def is_admin(self):
+        """Check if user has admin privileges based on roles."""
+        return 'realm-admin' in self.realm_roles

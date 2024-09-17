@@ -7,7 +7,8 @@ from .views import (
     RefreshTokenView,
     LogOutView,
     SimpleLoginView,
-    UserProfileView
+    UserProfileView,
+    CreateUserView
 )
 from rest_framework.routers import DefaultRouter
 
@@ -33,6 +34,9 @@ urlpatterns = [
      path('simple-login/',
           SimpleLoginView.as_view(),
           name='simple_login'),
+     path('create-user/',
+          CreateUserView.as_view(),
+          name='create_user'),
 ]
 
 router = DefaultRouter()

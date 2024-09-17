@@ -25,7 +25,7 @@ def create_user(
     email: str,
     username: str,
     firstName: str,
-    lastname: str,
+    lastName: str,
     enabled: True,
     password: str
 ):
@@ -35,7 +35,7 @@ def create_user(
          "username": username,
          "enabled": enabled,
          "firstName": firstName,
-         "lastName": lastname,
+         "lastName": lastName,
          "credentials": [{"value": password, "type": "password"}]},
         exist_ok=False
     )

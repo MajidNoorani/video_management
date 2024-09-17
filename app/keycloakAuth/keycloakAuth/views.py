@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from urllib.parse import urlencode
-from . import KC_openID_services
+from . import KC_openID_services, KC_admin_services
 from . import serializers
 from .authentication import IsKeycloakAuthenticated
 from rest_framework import status, viewsets, mixins
@@ -279,3 +279,55 @@ class UserProfileView(mixins.CreateModelMixin,
     def perform_update(self, serializer):
         """Create a new Comment"""
         serializer.save(updatedDate=timezone.now())
+
+
+class CreateUserView(GenericAPIView):
+    """View for manage user profile side fields"""
+    serializer_class = serializers.CreateUserSerializer
+    parser_classes = [MultiPartParser]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data.get('username')
+            email = serializer.validated_data.get('email')
+            password = serializer.validated_data.get('password')
+            firstName = serializer.validated_data.get('firstName')
+            lastName = serializer.validated_data.get('lastName')
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = KC_admin_services.create_user(
+                email=email,
+                username=username,
+                password=password,
+                firstName=firstName,
+                lastName=lastName,
+                enabled=True
+                )
+            print(user)
+            # response_serializer = serializers.TokenSerializer(data={
+            #     'access_token': tokens['access_token'],
+            #     'expires_in': tokens['expires_in'],
+            #     'refresh_token': tokens['refresh_token'],
+            #     'refresh_expires_in': tokens['refresh_expires_in'],
+            #     'token_type': tokens['token_type']
+            # })
+            # if response_serializer.is_valid():
+            return Response(user)
+            # else:
+            #     return Response(response_serializer.errors,
+            #                     status=status.HTTP_400_BAD_REQUEST)
+        except KeycloakAuthenticationError:
+            return Response(
+                {'detail': 'Username or Password not correct!'},
+                status=status.HTTP_401_UNAUTHORIZED
+                )
+        except Exception as e:
+            # Handle other exceptions
+            return Response(
+                {'detail': 'An unexpected error occurred', 'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
