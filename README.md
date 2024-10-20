@@ -1,5 +1,5 @@
 # Video Upload Manager
-
+A system for uploading videos and tracking the progress using Websockets In Django
 ## How to run:
 1. install packages in [requirements.txt](requirements.txt) with
 
